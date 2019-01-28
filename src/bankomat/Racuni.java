@@ -14,19 +14,44 @@ public class Racuni extends Start {
 	private String ime;
 	private double pare;
 	private String sifra;
-
-	public static void crate() {
-		if(!x.equals(null)) {
-			System.out.println("Just sfdf");
-			x.nextLine();
-		}
-		System.out.print("Postavite korisnicko ime: ");
-		String ime = ScanStr();
-		System.out.print("Postavite korisnicku sifru: ");
-		String sifra = ScanStr();
+	/**
+     * Dodaje racun na users ArrayListu
+     * 
+     * 
+     */
+	public static Racuni crate(String ime, String sifra) {
 		int rnd = rnd();
-		new Racuni(ime, sifra, rnd,0);
-		menu(1);
+		Racuni rcn = new Racuni(ime, sifra, 0, rnd);
+		tren(rcn);
+		return rcn;
+
+	}
+	/**
+     * Ova metoda postavlja static varijable uzimajuci podatke od odredjenog racuna
+     * 
+     * 
+     */
+	public static void tren(Racuni racun) {
+		trenutnoIme = racun.ime;
+		trenutniId = racun.id;
+		trenutnePare = racun.pare;
+		trenutnaSifra = racun.sifra;
+	}
+	/**
+     * Ova metoda dodaje pare na odredjeni racun
+     * 
+     * 
+     */
+	public void dodaj(double iznos) {
+		this.pare += iznos;
+	}
+	/**
+     * Ova metoda oduzima pare od odredjenog racuna
+     * 
+     * 
+     */
+	public void oduzmi(double iznos) {
+		this.pare -= iznos;
 	}
 
 	/**
@@ -44,13 +69,13 @@ public class Racuni extends Start {
 		}
 		return rnd;
 	}
-
-	public static void login() {
-		System.out.print("Unesite korisnicko ime: ");
-		String ime = ScanStr();
-		System.out.print("Unesite korisnicku sifru: ");
-		String sifra = ScanStr();
-		String listaGreski = "============================\nError:";
+	/**
+     * Ova metoda prima ime i sifru te istrazuje da li ce se to dvoje podudarati sa racunom u users ArrayListi, ako je to ispunjeno ulazi u user menu
+     * 
+     * 
+     */
+	public static Racuni login(String ime, String sifra) {
+		Racuni taj=new Racuni();
 		for (int i = 0; i < users.size(); i++) {
 			if (users.get(i).getIme().equals(ime)) {
 				if (users.get(i).getSifra().equals(sifra)) {
@@ -58,108 +83,58 @@ public class Racuni extends Start {
 					setTrenutnaSifra(users.get(i).getSifra());
 					setTrenutnePare(users.get(i).getPare());
 					setTrenutniId(users.get(i).getId());
-					userMenu(1);
-					return;
+					userMenu(1,users.get(i).getId());
+					taj = users.get(i);
 				} else {
-					listaGreski += "Netacno unesena sifra!!";
-					greska(listaGreski);
+					System.out.println("Netacno unesena sifra!!");
+					menu(3);
 				}
 			} else if (i == users.size() - 1) {
-				listaGreski = listaGreski + "Nepronadjeno ime!!";
-				greska(listaGreski);
+				System.out.println("Nepronadjeno ime!!");
+				menu(3);
 			}
 		}
+		return taj;
 	}
 
-	public static void transfer() {
-		String listaGreski = "============================\nError:";
-		System.out.println("===============================");
-		System.out.println("Unos informacija o korisniku\nkome saljete novac");
-		System.out.println("===============================");
-		System.out.print("ID: ");
-		int id = ScanInt();
-		System.out.println("==============");
-		System.out.print("Ime: ");
-		String ime = ScanStr();
-		System.out.println("==============");
-		for (int i = 0; i < users.size(); i++) {
-			if (id == users.get(i).getId()) {
-				if (users.get(i).getIme().equals(ime)) {
-					System.out.println("====================");
-					System.out.println("Korsnik " + ime + " je pronadjen!!!");
-					System.out.println("====================");
-					System.out.print("Koliko KM zelite poslati: ");
-					double iznos = ScanInt();
-					setTrenutnePare(trenutnePare - iznos);
-					userMenu(1);
-				} else {
-					listaGreski += "Ime ne pripada unjetom ID-ju!!!!\\n=============================";
-					System.out.println(listaGreski);
-					userMenu(3);
-				}
-			} else if (i == users.size() - 1) {
-				listaGreski += "Ne postoji odredjeni ID!!!\n=============================";
-				System.out.println(listaGreski);
-				userMenu(3);
-			}
-		}
-
-	}
-
-	public static void status() {
-		System.out.println("======================");
-		System.out.println("Ime: " + trenutnoIme);
-		System.out.println("Id: " + trenutniId);
-		System.out.println("Sifra: " + trenutnaSifra);
-		System.out.println("Pare: "+ trenutnePare);
-		System.out.println("======================");
-		userMenu(1);
-	}
 	/**
-	 * Ova metoda obavlja logout funkciju.
-	 * U ovom slucaju obavlja duznosti vracanja staticnih varijabli na default 
+     * Ova metoda vraca sve podatke o odredjenom racunu 
+     * 
+     * 
+     */
+
+	public void status() {
+		System.out.println("======================");
+		System.out.println("Ime: " + this.getIme());
+		System.out.println("Id: " + this.getId());
+		System.out.println("Sifra: " + this.getSifra());
+		System.out.println("Pare: " + this.getPare());
+		System.out.println("======================");
+	}
+
+	/**
+	 * Ova metoda obavlja logout funkciju. U ovom slucaju obavlja duznosti vracanja
+	 * staticnih varijabli na default
 	 * 
-	 * @return - Vraca random broj od 1 do 10000
+	 * 
 	 */
-	public static void izlaz() {
-		for (int i = 0; i < users.size(); i++) {
-			if (trenutniId == users.get(i).getId()) {
-				users.get(i).pare = trenutnePare;
-				trenutnePare=0;
-				trenutnoIme=null;
-				trenutniId=0;
-				trenutnaSifra=null;
-				menu(4);
-			}
-		}
+	public void izlaz() {
+		this.pare = trenutnePare;
+		trenutnePare = 0;
+		trenutnoIme = null;
+		trenutniId = 0;
+		trenutnaSifra = null;
+		
+		
 	}
 
-	public static void greska(String listaGreski) {
-		System.out.println(listaGreski);
-		System.out.println("==============================");
-		System.out.println("1 - Pokusaj ponovo\n2 - Izlaz");
-		System.out.println("==============================");
-		System.out.print("Vas izbor: ");
-		int odluka = ScanInt();
-		switch (odluka) {
-		case 1:
-			String br = ScanStr();
-			System.out.println("=================");
-			login();
-			break;
-		case 2:
-			menu(3);
-			break;
-		default:
-			System.out.println("==============");
-			System.out.println("Nevazeci unos!");
-			System.out.println("==============");
-			greska(listaGreski);
-			break;
-		}
-	}
+	/**
+     * Ova metoda rukuje sa exceptionima koji se nadju kada pokusamo unjeti String tip podataka
+     * 
+     * @return - Vraca unesenu String varijablu
+     */
 
-	private static String ScanStr() {
+	public static String ScanStr() {
 		int cross = 0;
 		String str = " ";
 		do {
@@ -167,7 +142,6 @@ public class Racuni extends Start {
 				str = x.nextLine();
 				cross = 1;
 			} catch (Exception e) {
-				x.nextLine();
 				System.out.println("========================");
 				System.out.println("Greska: " + e);
 				System.out.print("Pokusaj ponovo: ");
@@ -177,8 +151,12 @@ public class Racuni extends Start {
 
 		return str;
 	}
-
-	private static int ScanInt() {
+	/**
+     * Ova metoda rukuje sa exceptionima koji se nadju kada pokusamo unjeti int tip podataka
+     * 
+     * @return - Vraca unesenu int varijablu
+     */
+	public static int ScanInt() {
 		int cross = 0, broj = 0;
 		do {
 			try {
@@ -197,90 +175,196 @@ public class Racuni extends Start {
 	}
 
 	// KORSTRUKTORI & GET\SET METODE
-	String getIme() {
+	/**
+     * 
+     * 
+     * 
+     * @return Vracanje imena odredjnog racuna
+     */
+	public String getIme() {
 		return ime;
 	}
-
+	/**
+     * 
+     * 
+     * 
+     * postavljanje  imena odredjenog racuna
+     */
 	void setIme(String ime) {
 		this.ime = ime;
 	}
-
-	String getSifra() {
+	/**
+     * 
+     * 
+     * 
+     * @return Vracanje sifre odredjnog racuna
+     */
+	public String getSifra() {
 		return sifra;
 	}
-
+	/**
+     * 
+     * 
+     * 
+     * postavljanje sifre odredjenog racuna
+     * 
+     *      */
 	void setSifra(String sifra) {
 		this.sifra = sifra;
 	}
-
+	/**
+     * 
+     * 
+     * 
+     * @return Vraca odredjeno ime
+     */
 	static String getTrenutnoIme() {
 		return trenutnoIme;
 	}
-
+	/**
+     * 
+     * 
+     * 
+     * postavljanje staticnog imena
+     */
 	static void setTrenutnoIme(String trenutnoIme) {
 		Racuni.trenutnoIme = trenutnoIme;
 	}
-
+	/**
+     * 
+     * 
+     * 
+     * @return Vracanje staticne sifre
+     */
 	static String getTrenutnaSifra() {
 		return trenutnaSifra;
 	}
-
+	/**
+     * 
+     * 
+     * 
+     * postavljenje  staticne sifre
+     */
 	static void setTrenutnaSifra(String trenutnaSifra) {
 		Racuni.trenutnaSifra = trenutnaSifra;
 	}
-
+	/**
+     * 
+     * 
+     * 
+     * @return Vracanje staticnog pare varijable
+     */
 	static double getTrenutnePare() {
 		return trenutnePare;
 	}
-
+	/**
+     * postavljanje para na static pare varijablu
+     * 
+     * 
+     * 
+     */
 	static void setTrenutnePare(double trenutnePare) {
 		Racuni.trenutnePare = trenutnePare;
 	}
 
-	double getPare() {
+	public double getPare() {
 		return pare;
 	}
-
+	
 	void setPare(double pare) {
 		this.pare = pare;
 	}
-
+	/**
+     * 
+     * 
+     * 
+     * @return Vracanje staticnog id-a
+     */
 	static int getTrenutniId() {
 		return trenutniId;
 	}
 
+	/**
+     * postavljanje id na static id varijablu
+     * 
+     * 
+     * 
+     */
 	static void setTrenutniId(int trenutniId) {
 		Racuni.trenutniId = trenutniId;
 	}
-
-	int getId() {
+	/**
+     * 
+     * 
+     * 
+     * @return Vracanje id odabranog racuna
+     */
+	public int getId() {
 		return id;
 	}
-
+	/**
+     * postavljanje id na neki racun
+     * 
+     * 
+     * 
+     */
 	void setId(int id) {
 		this.id = id;
 	}
-
-	public Racuni(String ime, String sifra, int rnd,int test) {
+	/**
+     * Konstruktor koji postavlja pare,ime,sifru i id na novonapravljeni racun
+     * 
+     * 
+     * 
+     */
+	public Racuni(String ime, String sifra, int rnd) {
 		this.ime = ime;
 		this.sifra = sifra;
-		this.pare = 0;
+		this.pare = 50;
 		this.id = rnd;
-		if(test==1)
 		users.add(this);
 	}
-
-	public Racuni(String ime, String sifra, double pare, int id,int test) {
+	/**
+     * Konstruktor koji postavlja sifru,ime i pare na novonapravljeni racun
+     * 
+     * 
+     * 
+     */
+	public Racuni(String ime, String sifra, double rnd) {
+		this.ime = ime;
+		this.sifra = sifra;
+		this.pare = rnd;
+		users.add(this);
+	}
+	/**
+     * Konstruktor koji postavlja pare,sifru,ime i id na novonapravljeni racun
+     * 
+     * 
+     * 
+     */
+	public Racuni(String ime, String sifra, double pare, int id) {
 		this.ime = ime;
 		this.sifra = sifra;
 		this.pare = pare;
 		this.id = id;
-		if(test==1)
 		users.add(this);
 	}
-
+	/**
+     * Konstruktor koji formira novi napravljeni racun
+     * 
+     * 
+     * 
+     */
 	public Racuni() {
 
 	}
-
+	/**
+     * Konstruktor koji postavlja pare na novonapravljeni racun
+     * 
+     * 
+     * 
+     */
+	public Racuni(double pare) {
+		this.pare=pare;
+	}
 }
